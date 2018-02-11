@@ -79,9 +79,9 @@ Select table format (firts two columns are selected):
 1. In the cells of the first column can be anything you want (this will be ignored)
 2. In the second column must be placed full names (as in Megaplan) of client.
 
-This columns are already added to the format (you just need to describe the rest columns)
+This columns are already added to the format (you just need to describe the rest columns).
 
-If you've done properly the you will see the model of table that requires a confirmation: `yes` or `no`
+If you've done properly then you will see the model of table that requires a confirmation: `yes` or `no`
 
 ```
 Select table format (firts two columns are selected):
