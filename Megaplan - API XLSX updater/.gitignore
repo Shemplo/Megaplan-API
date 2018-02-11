@@ -1,0 +1,12 @@
+/bin/
+.settings
+.classpath
+.project
+*.log
+*.jar
+*.tex
+*.aux
+*.cmd
+*.zip
+*.txt
+*.xlsx
