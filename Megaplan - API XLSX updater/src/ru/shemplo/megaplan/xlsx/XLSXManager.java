@@ -37,6 +37,8 @@ import ru.shemplo.support.UserProfile;
 
 public class XLSXManager implements AutoCloseable {
 
+	public static final String INPUT_FILE_NAME = "input.xlsx";
+	
 	private Map <String, UserProfile> clients;
 	private XSSFWorkbook workbook;
 	private OPCPackage pkg;

@@ -74,7 +74,7 @@ public class MegaplanAPIManager {
 		try (
 			XLSXManager xlsx = new XLSXManager ();
 		) {
-			xlsx.loadWorkbook ("input.xlsx", true);
+			xlsx.loadWorkbook (XLSXManager.INPUT_FILE_NAME, true);
 			System.out.println ("`xlsx` file loaded");
 			
 			differences = xlsx.findUpdatedProfiles (remoteProfiles);
