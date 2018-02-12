@@ -102,20 +102,5 @@ and list of names of fields that is *out-of-date* on the server.
 
 ## Requirements
 
-To run application you will need libraries:
-* commons-codec-1.11+
-* commons-collections4-4.1+
-* commons-logging-1.1.1+
-* httpclient-4.5.5+
-* httpcore-4.4.9+
-* json-20180130+
-* junit-4.12+
-* ooxml-schemas-1.0+
-* poi-3.17+
-* poi-ooxml-3.17+
-* xmlbeans-2.6.0+ 
-
 Java version: 
 * JRE 8+
-
-**Remark**: `pom` is soon expected
