@@ -103,4 +103,4 @@ and list of names of fields that is *out-of-date* on the server.
 ## Requirements
 
 Java version: 
-* JRE 8+
+> JRE 8+
