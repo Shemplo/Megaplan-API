@@ -12,7 +12,7 @@ public class Pair <T, D> {
 	
 	@Override
 	public String toString () {
-		return f + " " + s;
+		return f + " - " + s;
 	}
 	
 	public static <T, D> Pair <T, D> make (T t, D d) {

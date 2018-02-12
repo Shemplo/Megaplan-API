@@ -1,6 +1,7 @@
 package ru.shemplo.megaplan.xlsx;
 
 import static ru.shemplo.megaplan.network.APIConnection.sendRequest;
+import static ru.shemplo.megaplan.updater.ConsoleAdapter.getFormattedAnswer;
 import static ru.shemplo.megaplan.updater.ConsoleAdapter.getVariantedAnswer;
 
 import java.io.File;
@@ -31,7 +32,6 @@ import ru.shemplo.exception.UserProfileException;
 import ru.shemplo.exception.WorkbookException;
 import ru.shemplo.megaplan.network.APIFormatter;
 import ru.shemplo.megaplan.network.RequestAction;
-import ru.shemplo.megaplan.updater.ConsoleAdapter;
 import ru.shemplo.support.Pair;
 import ru.shemplo.support.UserProfile;
 
@@ -110,12 +110,14 @@ public class XLSXManager implements AutoCloseable {
 						if (cell == null) { break; }
 						
 						String column = FIELDS.get (fields.get (j)).f;
-						String value = null;
+						String value = ""; // Default empty value
 						
 						if (cell.getCellTypeEnum ().equals (CellType.STRING)) {
 							value = cell.getStringCellValue ();
 						} else if (cell.getCellTypeEnum ().equals (CellType.NUMERIC)) {
 							value = "" + cell.getNumericCellValue ();
+						} else if (cell.getCellTypeEnum ().equals (CellType.FORMULA)) {
+							value = cell.getCellFormula ();
 						}
 						
 						value = APIFormatter.format (column, value);
@@ -147,7 +149,7 @@ public class XLSXManager implements AutoCloseable {
 		try {
 			loadFieldsList ();
 			
-			String stringList = ConsoleAdapter.getFormattedAnswer (question, 3, regexp);
+			String stringList = getFormattedAnswer (question, 3, regexp);
 			if (stringList.equals ("list")) {
 				printFieldsList ();
 				return null;

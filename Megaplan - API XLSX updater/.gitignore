@@ -10,3 +10,5 @@
 *.zip
 *.txt
 *.xlsx
+/lib/
+/target/
