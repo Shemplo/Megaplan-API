@@ -100,6 +100,8 @@ public class UserProfile {
 	
 	public static String convertDate (String date) {
 		String [] bParts = date.split ("\\."); // Converting to Y-m-d
+		if (bParts.length < 3) { return ""; }
+		
 		return bParts [2] + "-" + bParts [1] + "-" + bParts [0];
 	}
 	

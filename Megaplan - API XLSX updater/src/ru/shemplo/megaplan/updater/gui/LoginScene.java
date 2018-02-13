@@ -12,8 +12,8 @@ import ru.shemplo.megaplan.network.APIConnection;
 
 public class LoginScene extends AbstractScene {
 	
+	private TextField loginField, hostField;
 	private PasswordField passwordField;
-	private TextField loginField;
 	private Label progressLog;
 	private Button authButton;
 	private BorderPane root;
@@ -33,6 +33,9 @@ public class LoginScene extends AbstractScene {
 		this.passwordField = (PasswordField) scene.lookup ("#client_password");
 		passwordField.applyCss ();
 		
+		this.hostField = (TextField) scene.lookup ("#client_host");
+		hostField.applyCss ();
+		
 		this.authButton = (Button) scene.lookup ("#client_auth");
 		authButton.setOnAction (ae -> authorize ());
 		authButton.setMinWidth (48);
@@ -50,6 +53,7 @@ public class LoginScene extends AbstractScene {
 		if (System.getProperty ("megaplan.api.login") != null) {
 			passwordField.setText (System.getProperty ("megaplan.api.password"));
 			loginField.setText (System.getProperty ("megaplan.api.login"));
+			hostField.setText (System.getProperty ("megaplan.api.host"));
 			authorize ();
 		}
 	}
@@ -60,9 +64,10 @@ public class LoginScene extends AbstractScene {
 		Runnable task = () -> {
 			try {
 				String password = passwordField.getText ().trim (),
-						login = loginField.getText ().trim ();
-				password = APIConnection.hashMD5 (password);
-				APIConnection.authorize (login, password);
+						login = loginField.getText ().trim (),
+						host = hostField.getText ().trim ();
+				//password = APIConnection.hashMD5 (password);
+				APIConnection.authorize (login, password, host);
 				if (APIConnection.isAuthorized ()) {
 					Platform.runLater ( // Turn back to main thread
 							() -> changeState (true, "Authorized"));

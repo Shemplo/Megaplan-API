@@ -3,7 +3,7 @@ package ru.shemplo.megaplan.network;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.codec.digest.HmacAlgorithms.HMAC_SHA_1;
 import static ru.shemplo.megaplan.network.RequestAction.AUTH_REQUEST;
-import static ru.shemplo.megaplan.updater.MegaplanAPIManager.CLIENT_HOST;
+import static ru.shemplo.megaplan.updater.MegaplanAPIManager.MEGAPLAN_HOST;
 import static ru.shemplo.megaplan.updater.MegaplanAPIManager.SERVER_PROTOCOL;
 
 import java.io.BufferedReader;
@@ -47,7 +47,7 @@ public class APIConnection {
 											Locale.ENGLISH);
 
 	@SuppressWarnings ("unused")
-	private static String SECRET_KEY, ACCESS_ID, LOGIN;
+	private static String SECRET_KEY, ACCESS_ID, LOGIN, HOST;
 	private static boolean authorized = false;
 	private static HmacUtils HASH_GENERATOR;
 
@@ -57,14 +57,15 @@ public class APIConnection {
 
 	/* -===| AUTHORIZATION SECTION |===- */
 
-	public static void authorize (String login, String password) throws AuthorizationException {
+	public static void authorize (String login, String password, String host) throws AuthorizationException {
 		if (password == null) { throw new AuthorizationException ("Password is null"); }
 		if (login == null) { throw new AuthorizationException ("Login is null"); }
+		if (host == null) { throw new AuthorizationException ("Host is null"); }
 
 		if (isAuthorized () && login.equals (LOGIN)) { return; } // Already authorized
 		password = hashMD5 (password);
 
-		String url = SERVER_PROTOCOL + CLIENT_HOST + AUTH_REQUEST.URI;
+		String url = SERVER_PROTOCOL + host + "." + MEGAPLAN_HOST + AUTH_REQUEST.URI;
 		HttpPost postRequestUrl = new HttpPost (url);
 
 		List <NameValuePair> params = new ArrayList <> ();
@@ -113,6 +114,7 @@ public class APIConnection {
 			APIConnection.authorized = true;
 			ACCESS_ID = tokens.f;
 			LOGIN = login;
+			HOST = host;
 			
 			// Done
 		} catch (ClientProtocolException cpe) {
@@ -146,8 +148,19 @@ public class APIConnection {
 			String message = "(Argument) Property with password isn't declared";
 			throw new AuthorizationException (message, iae);
 		}
+		
+		String host = null; 
+		try {
+			host = System.getProperty ("megaplan.api.host");
+		} catch (SecurityException se) {
+			String message = "(Security) failed get host";
+			throw new AuthorizationException (message, se);
+		} catch (IllegalArgumentException iae) {
+			String message = "(Argument) Property with password isn't declared";
+			throw new AuthorizationException (message, iae);
+		}
 
-		authorize (login, password);
+		authorize (login, password, host);
 	}
 
 	/* -===| REQUESTS SECTION |===- */
@@ -169,7 +182,7 @@ public class APIConnection {
 		String signature = generateSignature (RequestMethod.POST, date, action);
 		String signatureHash = hashSignature (signature);
 
-		String url = SERVER_PROTOCOL + CLIENT_HOST + action.URI;
+		String url = SERVER_PROTOCOL + HOST + "." + MEGAPLAN_HOST + action.URI;
 		HttpPost postRequestUrl = new HttpPost (url);
 
 		postRequestUrl.addHeader ("Content-Type", "application/x-www-form-urlencoded");
@@ -232,7 +245,7 @@ public class APIConnection {
 		sb.append ("application/x-www-form-urlencoded\n");
 		sb.append (DATE_FORMAT.format (date));
 		sb.append ("\n");
-		sb.append (CLIENT_HOST);
+		sb.append (HOST + "." + MEGAPLAN_HOST);
 		sb.append (action.URI);
 		return sb.toString ();
 	}

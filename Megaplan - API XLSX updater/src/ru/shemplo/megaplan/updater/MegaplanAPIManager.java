@@ -10,10 +10,13 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import ru.shemplo.exception.AuthorizationException;
 import ru.shemplo.exception.ConsoleException;
 import ru.shemplo.exception.GUIException;
@@ -30,10 +33,12 @@ import ru.shemplo.support.UserProfile;
 public class MegaplanAPIManager {
 	
 	public static final String SERVER_PROTOCOL = "https://";
-	public static final String CLIENT_HOST = "mimino000.megaplan.ru";
+	public static final String MEGAPLAN_HOST = "megaplan.ru";
 	
 	public static void main (String... args) {
 		System.setProperty ("megaplan.xlsx.sheet", "TDSheet");
+		
+		//launch (args);
 		
 		System.out.println ("Authorizing...");
 		
@@ -110,6 +115,9 @@ public class MegaplanAPIManager {
 		System.out.println ("Sending updated to server...");
 		int successfulSendings = 0;
 		
+		List <Integer> unsuccess = new ArrayList <> ();
+		int index = 0;
+		
 		for (Pair <UserProfile, List <String>> pair : differences) {
 			try {
 				List <Pair <String, ?>> params = new ArrayList <> ();
@@ -130,7 +138,10 @@ public class MegaplanAPIManager {
 				
 				if (!code.equals ("ok")) {
 					System.out.println (status.getString ("message"));
+					unsuccess.add (index);
 				}
+				
+				index ++;
 			} catch (RequestException | NullPointerException e) {
 				System.err.println (e.toString ());
 			} catch (UserProfileException upe) {
@@ -141,8 +152,29 @@ public class MegaplanAPIManager {
 		System.out.println ("Sent updated: " + differences.size () 
 							+ " (successful: " + successfulSendings + ")");
 		if (successfulSendings != differences.size ()) {
-			System.out.println ("Saving failed to the file... (not done yet)");
+			System.out.println ("Saving failed to the file...");
+			List <List <Pair <String, String>>> values = new ArrayList <> ();
 			
+			for (int unsIndex : unsuccess) {
+				UserProfile profile = differences.get (unsIndex).f;
+				List <String> fields = differences.get (unsIndex).s;
+				
+				try {
+					List <Pair <String, String>> line = new ArrayList <> ();
+					line.add (Pair.make ("Name", profile.getValue ("Name")));
+					
+					for (String field : fields) {
+						String value = profile.getValue (field);
+						line.add (Pair.make (field, value));
+					}
+					
+					values.add (line);
+				} catch (UserProfileException upe) {
+					System.out.println (upe.toString ());
+				}
+			}
+			
+			XLSXManager.writeToNewFile (values);
 		}
 	}
 	
@@ -160,8 +192,7 @@ public class MegaplanAPIManager {
 		return STAGE_SCENE;
 	}
 	
-	/*
-	@Override
+	//@Override
 	public void start (Stage stage) throws Exception {
 		STAGE_SCENE = new Scene (new Pane (), 100, 50);
 		switchScenes (AppScene.LOADING_SCENE);
@@ -179,7 +210,6 @@ public class MegaplanAPIManager {
 		
 		switchScenes (AppScene.LOGIN_SCENE);
 	}
-	*/
 	
 	public static void switchScenes (AppScene scene) {
 		if (!SCENES.containsKey (scene)) {

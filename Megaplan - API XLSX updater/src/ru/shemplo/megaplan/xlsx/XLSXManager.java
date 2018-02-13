@@ -5,7 +5,9 @@ import static ru.shemplo.megaplan.updater.ConsoleAdapter.getFormattedAnswer;
 import static ru.shemplo.megaplan.updater.ConsoleAdapter.getVariantedAnswer;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -95,7 +97,7 @@ public class XLSXManager implements AutoCloseable {
 			String message = "(Attempts) attempts expired";
 			throw new WorkbookException (message);
 		}
-			
+		
 		for (int i = 0; i <= sheet.getLastRowNum (); i ++) {
 			Row row = sheet.getRow (i); Cell fioCell = row.getCell (1);
 			if (fioCell.getCellTypeEnum ().equals (CellType.STRING)
@@ -119,6 +121,8 @@ public class XLSXManager implements AutoCloseable {
 						} else if (cell.getCellTypeEnum ().equals (CellType.FORMULA)) {
 							value = cell.getCellFormula ();
 						}
+						
+						if (value.equals ("")) { continue; } // Empty value -> ignore it
 						
 						value = APIFormatter.format (column, value);
 						properties.add (Pair.make (column, value));
@@ -329,6 +333,50 @@ public class XLSXManager implements AutoCloseable {
 	@Override
 	public void close () throws Exception {
 		if (pkg != null) { pkg.close (); }
+	}
+	
+	public static void writeToNewFile (List <List <Pair <String, String>>> values) {
+		List <String> fields = new ArrayList <> ();
+		fields.add ("Name");
+		
+		if (values == null) { return; }
+		for (int i = 0; i < values.size (); i ++) {
+			List <Pair <String, String>> line = values.get (i);
+			for (int j = 0; j < line.size (); j ++) {
+				if (fields.indexOf (line.get (j).f) == -1) {
+					fields.add (line.get (j).f);
+				}
+			}
+		}
+		
+		File errorFile = new File ("error.xlsx");
+		if (errorFile.exists ()) {
+			errorFile.delete ();
+		}
+		
+		try (
+			XSSFWorkbook workbook = new XSSFWorkbook ();
+			OutputStream os = new FileOutputStream (errorFile);
+		) {
+			String shName = System.getProperty ("megaplan.xlsx.sheet");
+			XSSFSheet sheet = workbook.createSheet (shName);
+			
+			for (int i = 0; i < values.size (); i ++) {
+				List <Pair <String, String>> line = values.get (i);
+				Row row = sheet.createRow (i);
+				
+				for (int j = 0; j < line.size (); j ++) {
+					Pair <String, String> value = line.get (j);
+					int columnNumber = 1 + fields.indexOf (value.f);
+					Cell cell = row.createCell (columnNumber);
+					cell.setCellValue (value.s);
+				}
+			}
+			
+			workbook.write (os);
+		} catch (IOException ioe) {
+			ioe.printStackTrace ();
+		}
 	}
 	
 }

@@ -41,6 +41,17 @@
 							left="5"/> 
 					</HBox.margin>
 				</PasswordField>
+				<TextField
+					fx:id="client_host"
+					promptText="Client host">
+					<HBox.margin>
+						<Insets
+							top="10"
+							right="5"
+							bottom="5"
+							left="5"/> 
+					</HBox.margin>
+				</TextField>
 				<Button
 					fx:id="client_auth"
 					text="Auth">
