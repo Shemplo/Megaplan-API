@@ -100,9 +100,11 @@ public class XLSXManager implements AutoCloseable {
 		
 		for (int i = 0; i <= sheet.getLastRowNum (); i ++) {
 			Row row = sheet.getRow (i); Cell fioCell = row.getCell (1);
-			if (fioCell.getCellTypeEnum ().equals (CellType.STRING)
-					&& (fioCell.getStringCellValue () != null 
-					&& fioCell.getStringCellValue ().length () > 0)) {
+			if (fioCell == null) { continue; }
+			
+			if ((fioCell.getStringCellValue () != null 
+					&& fioCell.getStringCellValue ().length () > 0)
+					&& fioCell.getCellTypeEnum ().equals (CellType.STRING)) {
 				try {
 					List <Pair <String, String>> properties = new ArrayList <> ();
 					for (int j = 0; j < fields.size (); j ++) {

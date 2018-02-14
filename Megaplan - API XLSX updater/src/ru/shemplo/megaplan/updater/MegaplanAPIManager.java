@@ -10,7 +10,6 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -30,7 +29,7 @@ import ru.shemplo.megaplan.xlsx.XLSXManager;
 import ru.shemplo.support.Pair;
 import ru.shemplo.support.UserProfile;
 
-public class MegaplanAPIManager {
+public class MegaplanAPIManager /*extends Application*/ {
 	
 	public static final String SERVER_PROTOCOL = "https://";
 	public static final String MEGAPLAN_HOST = "megaplan.ru";
@@ -152,7 +151,7 @@ public class MegaplanAPIManager {
 		System.out.println ("Sent updated: " + differences.size () 
 							+ " (successful: " + successfulSendings + ")");
 		if (successfulSendings != differences.size ()) {
-			System.out.println ("Saving failed to the file...");
+			System.out.println ("Saving failed to the file... ");
 			List <List <Pair <String, String>>> values = new ArrayList <> ();
 			
 			for (int unsIndex : unsuccess) {
@@ -176,6 +175,8 @@ public class MegaplanAPIManager {
 			
 			XLSXManager.writeToNewFile (values);
 		}
+		
+		System.out.println ("Done");
 	}
 	
 	public static final String SCENES_LOCATION = "ru/shemplo/megaplan/updater/gui/schema";
