@@ -39,7 +39,9 @@ public class ConsoleAdapter {
 				String line = BR.readLine ().toLowerCase ();
 				StringTokenizer st = new StringTokenizer (line);
 				
-				String answer = st.nextToken (); int index = -1;
+				String answer = possibleAnswers [0]; int index = -1;
+				if (st.hasMoreTokens ()) { answer = st.nextToken (); }
+				
 				for (int i = 0; i < possibleAnswers.length; i ++) {
 					if (answer.equals (possibleAnswers [i])) {
 						index = i; break;

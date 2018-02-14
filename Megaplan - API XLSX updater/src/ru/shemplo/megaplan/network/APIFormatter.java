@@ -29,7 +29,6 @@ public class APIFormatter {
 		rules.put ("Category183CustomFieldSrokDeystviyaR", d -> UserProfile.convertDate (d));
 		rules.put ("Category183CustomFieldDataZaklyucheniyaDogovora", d -> UserProfile.convertDate (d));
 		rules.put ("Category183CustomFieldDataPrekrashchDogovora", d -> UserProfile.convertDate (d));
-		rules.put ("", d -> UserProfile.convertDate (d));
 	}
 	
 	public static String format (String key, String value) {
