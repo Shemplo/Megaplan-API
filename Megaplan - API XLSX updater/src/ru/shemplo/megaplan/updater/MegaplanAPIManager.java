@@ -55,14 +55,27 @@ public class MegaplanAPIManager /*extends Application*/ {
 		
 		List <UserProfile> remoteProfiles = new ArrayList <> ();
 		try {
-			JSONObject answer = APIConnection.sendRequest (RequestAction.CLIENTS_LIST, null);
-			JSONObject data = answer.getJSONObject ("data");
+			List <Pair <String, ?>> params = new ArrayList <> ();
+			int offset = 0;
 			
-			
-			JSONArray clients = data.getJSONArray ("clients");
-			for (int i = 0; i < clients.length (); i ++) {
-				JSONObject object = clients.getJSONObject (i);
-				remoteProfiles.add (UserProfile.makeFromJSON (object));
+			while (true) {
+				params.clear ();
+				params.add (Pair.make ("Offset", "" + offset));
+				params.add (Pair.make ("Limit", "1000"));
+				
+				JSONObject answer = APIConnection.sendRequest (RequestAction.CLIENTS_LIST, params);
+				JSONObject data = answer.getJSONObject ("data");
+				
+				JSONArray clients = data.getJSONArray ("clients");
+				for (int i = 0; i < clients.length (); i ++) {
+					JSONObject object = clients.getJSONObject (i);
+					remoteProfiles.add (UserProfile.makeFromJSON (object));
+				}
+				
+				offset += 1000;
+				if (clients.length () == 0) {
+					break;
+				}
 			}
 			
 			System.out.println (remoteProfiles.size () + " remote clients loaded");

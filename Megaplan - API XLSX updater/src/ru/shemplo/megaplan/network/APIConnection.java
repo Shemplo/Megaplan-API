@@ -201,6 +201,19 @@ public class APIConnection {
 			if (status.getStatusCode () >= 300) {
 				String message = ("(" + status.getStatusCode () + ") " + status.getReasonPhrase ());
 				System.err.println (message);
+				
+				HttpEntity content = r.getEntity ();
+				InputStream is = content.getContent ();
+				Reader reader = new InputStreamReader (is, UTF_8);
+				BufferedReader br = new BufferedReader (reader);
+
+				StringBuilder sb = new StringBuilder ();
+				String s;
+				while ((s = br.readLine ()) != null) {
+					sb.append (s);
+				}
+				
+				System.out.println (sb.toString ());
 				return null;
 			}
 
