@@ -19,6 +19,21 @@ public class UserProfile {
 		this.ID = id;
 	}
 	
+	public UserProfile (long id, List <Pair <String, String>> properties) throws UserProfileException {
+		this.values = new HashMap <> ();
+		if (properties == null || properties.size () == 0) {
+			String message = "(NPE) given properties array is null";
+			throw new UserProfileException (message);
+		}
+		
+		for (int i = 0; i < properties.size (); i ++) {
+			Pair <String, String> property = properties.get (i);
+			values.put (property.f, property.s);
+		}
+		
+		this.ID = id;
+	}
+	
 	@SafeVarargs
 	public UserProfile (long id, Pair <String, String>... properties) throws UserProfileException {
 		this.values = new HashMap <> ();

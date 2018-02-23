@@ -1,6 +1,6 @@
 package ru.shemplo.megaplan.xlsx;
 
-import static ru.shemplo.megaplan.network.APIConnection.sendRequest;
+import static ru.shemplo.megaplan.network.APIConnection_dep.sendRequest;
 import static ru.shemplo.megaplan.updater.ConsoleAdapter.getFormattedAnswer;
 import static ru.shemplo.megaplan.updater.ConsoleAdapter.getVariantedAnswer;
 
@@ -31,13 +31,14 @@ import org.json.JSONObject;
 import ru.shemplo.exception.ConsoleException;
 import ru.shemplo.exception.RequestException;
 import ru.shemplo.exception.UserProfileException;
-import ru.shemplo.exception.WorkbookException;
-import ru.shemplo.megaplan.network.APIFormatter;
+import ru.shemplo.exception.TableException;
+import ru.shemplo.megaplan.network.APIFormatter_dep;
 import ru.shemplo.megaplan.network.RequestAction;
+import ru.shemplo.megaplan.utils.XLSXUtils;
 import ru.shemplo.support.Pair;
 import ru.shemplo.support.UserProfile;
 
-public class XLSXManager implements AutoCloseable {
+public class XLSXManager_dep implements AutoCloseable {
 
 	public static final String INPUT_FILE_NAME = "input.xlsx";
 	
@@ -46,22 +47,22 @@ public class XLSXManager implements AutoCloseable {
 	private OPCPackage pkg;
 	private File bookFile;
 	
-	public void loadWorkbook (String path, boolean read) throws WorkbookException {
+	public void loadWorkbook (String path, boolean read) throws TableException {
 		Objects.requireNonNull (path, "Given path to workbook is null");
 		
 		if (pkg != null) { // Some book is already opened
 			String message = "Book " + bookFile.getName () + " is opened";
-			throw new WorkbookException (message);
+			throw new TableException (message);
 		}
 		
 		openWorkbook (path, read);
 	}
 	
-	public void loadWorkbook (String path) throws WorkbookException {
+	public void loadWorkbook (String path) throws TableException {
 		loadWorkbook (path, false);
 	}
 	
-	public void readWorkbook () throws WorkbookException {
+	public void readWorkbook () throws TableException {
 		if (clients != null) { return; } // Already read
 		this.clients = new HashMap <> ();
 		
@@ -70,10 +71,10 @@ public class XLSXManager implements AutoCloseable {
 			sheetName = System.getProperty ("megaplan.xlsx.sheet");
 		} catch (SecurityException se) {
 			String message = "(Security) failed get sheet name";
-			throw new WorkbookException (message, se);
+			throw new TableException (message, se);
 		} catch (IllegalArgumentException iae) {
 			String message = "(Argument) property with sheet isn't declared";
-			throw new WorkbookException (message, iae);
+			throw new TableException (message, iae);
 		}
 		
 		XSSFSheet sheet = workbook.getSheet (sheetName);
@@ -85,7 +86,7 @@ public class XLSXManager implements AutoCloseable {
 				if (fields == null) {
 					attempts ++; // It request for list
 				}
-			} catch (WorkbookException we) {
+			} catch (TableException we) {
 				Throwable cause = we.getCause ();
 				System.err.println (cause != null ? cause : we);
 			}
@@ -95,7 +96,7 @@ public class XLSXManager implements AutoCloseable {
 		
 		if (fields == null) {
 			String message = "(Attempts) attempts expired";
-			throw new WorkbookException (message);
+			throw new TableException (message);
 		}
 		
 		for (int i = 0; i <= sheet.getLastRowNum (); i ++) {
@@ -126,7 +127,7 @@ public class XLSXManager implements AutoCloseable {
 						
 						if (value.equals ("")) { continue; } // Empty value -> ignore it
 						
-						value = APIFormatter.format (column, value);
+						value = APIFormatter_dep.format (column, value);
 						properties.add (Pair.make (column, value));
 					}
 					
@@ -145,7 +146,7 @@ public class XLSXManager implements AutoCloseable {
 		System.out.println (clients.size () + " clients loaded");
 	}
 	
-	private static List <Integer> initParseFormat () throws WorkbookException {
+	private static List <Integer> initParseFormat () throws TableException {
 		List <Integer> fields = new ArrayList <> ();
 		fields.add (-1);
 		fields.add (0);
@@ -169,17 +170,17 @@ public class XLSXManager implements AutoCloseable {
 				int field = Integer.parseInt (token) - 1;
 				if (field < 0 || field >= FIELDS.size ()) {
 					String message = "(Format) number of field is out of range";
-					throw new WorkbookException (message);
+					throw new TableException (message);
 				}
 				
 				fields.add (field);
 			}
 		} catch (ConsoleException ce) {
 			String message = "(Format) failed to set up table format";
-			throw new WorkbookException (message, ce);
+			throw new TableException (message, ce);
 		} catch (RequestException | NullPointerException e) {
 			String message = "(API) failed to load fields list";
-			throw new WorkbookException (message, e);
+			throw new TableException (message, e);
 		}
 		
 		StringBuilder format = new StringBuilder ();
@@ -215,7 +216,7 @@ public class XLSXManager implements AutoCloseable {
 			if ("no".equals (answer)) { return null; } // Try do this again
 		} catch (ConsoleException ce) {
 			String message = "(Console) failed read console input";
-			throw new WorkbookException (message, ce);
+			throw new TableException (message, ce);
 		}
 		
 		return fields;
@@ -257,11 +258,11 @@ public class XLSXManager implements AutoCloseable {
 	}
 	
 	public List <Pair <UserProfile, List <String>>> 
-		findUpdatedProfiles (List <UserProfile> profiles) throws WorkbookException {
+		findUpdatedProfiles (List <UserProfile> profiles) throws TableException {
 		
 		if (profiles == null) {
 			String message = "(NPE) given profiles list is null";
-			throw new WorkbookException (message);
+			throw new TableException (message);
 		}
 		
 		List <Pair <UserProfile, List <String>>> updates = new ArrayList <> ();
@@ -296,8 +297,8 @@ public class XLSXManager implements AutoCloseable {
 		return updates;
 	}
 	
-	private void openWorkbook (String path, boolean read) throws WorkbookException {
-		URL rootPath = XLSXManager.class.getProtectionDomain ()
+	private void openWorkbook (String path, boolean read) throws TableException {
+		URL rootPath = XLSXManager_dep.class.getProtectionDomain ()
 											.getCodeSource ()
 											.getLocation ();
 		File root = new File (".");
@@ -310,7 +311,7 @@ public class XLSXManager implements AutoCloseable {
 		
 		if (!workbookFile.exists () || !workbookFile.isFile ()) {
 			String message = "Workbook file not found";
-			throw new WorkbookException (message);
+			throw new TableException (message);
 		}
 		
 		try {
@@ -323,10 +324,10 @@ public class XLSXManager implements AutoCloseable {
 			// Done
 		} catch (IOException ioe) {
 			String message = "(I/O) Failed to read from workbook";
-			throw new WorkbookException (message, ioe);
+			throw new TableException (message, ioe);
 		} catch (InvalidFormatException ife) {
 			String message = "(Format) Wrong format of file";
-			throw new WorkbookException (message, ife);
+			throw new TableException (message, ife);
 		}
 		
 		if (read) { readWorkbook (); }

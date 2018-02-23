@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
 
 <BorderPane 
 	xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		
+		<Label
+			text="Application is loading...">
+		</Label>
 	</center>
 </BorderPane>
 

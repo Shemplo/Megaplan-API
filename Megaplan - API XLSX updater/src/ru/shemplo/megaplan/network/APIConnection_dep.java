@@ -40,7 +40,7 @@ import ru.shemplo.exception.AuthorizationException;
 import ru.shemplo.exception.RequestException;
 import ru.shemplo.support.Pair;
 
-public class APIConnection {
+public class APIConnection_dep {
 
 	private static final DateFormat 
 		DATE_FORMAT = new SimpleDateFormat ("EEE, d MMM yyyy HH:mm:ss Z", 
@@ -111,7 +111,7 @@ public class APIConnection {
 			}
 
 			HASH_GENERATOR = new HmacUtils (HMAC_SHA_1, tokens.s);
-			APIConnection.authorized = true;
+			APIConnection_dep.authorized = true;
 			ACCESS_ID = tokens.f;
 			LOGIN = login;
 			HOST = host;

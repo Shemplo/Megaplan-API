@@ -8,7 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import ru.shemplo.exception.AuthorizationException;
-import ru.shemplo.megaplan.network.APIConnection;
+import ru.shemplo.megaplan.network.APIConnection_dep;
+import ru.shemplo.megaplan.updater.MegaplanAPIManager;
 
 public class LoginScene extends AbstractScene {
 	
@@ -67,10 +68,11 @@ public class LoginScene extends AbstractScene {
 						login = loginField.getText ().trim (),
 						host = hostField.getText ().trim ();
 				//password = APIConnection.hashMD5 (password);
-				APIConnection.authorize (login, password, host);
-				if (APIConnection.isAuthorized ()) {
+				APIConnection_dep.authorize (login, password, host);
+				if (APIConnection_dep.isAuthorized ()) {
 					Platform.runLater ( // Turn back to main thread
 							() -> changeState (true, "Authorized"));
+					MegaplanAPIManager.switchScenes (AppScene.MAIN_SCENE);
 					return;
 				}
 				

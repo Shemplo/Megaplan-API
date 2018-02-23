@@ -2,43 +2,32 @@ package ru.shemplo.megaplan.updater;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import ru.shemplo.exception.AuthorizationException;
-import ru.shemplo.exception.ConsoleException;
 import ru.shemplo.exception.GUIException;
-import ru.shemplo.exception.RequestException;
-import ru.shemplo.exception.UserProfileException;
-import ru.shemplo.exception.WorkbookException;
-import ru.shemplo.megaplan.network.APIConnection;
-import ru.shemplo.megaplan.network.RequestAction;
 import ru.shemplo.megaplan.updater.gui.AppScene;
-import ru.shemplo.megaplan.xlsx.XLSXManager;
-import ru.shemplo.support.Pair;
-import ru.shemplo.support.UserProfile;
+import ru.shemplo.megaplan.xlsx.TableManager;
 
-public class MegaplanAPIManager /*extends Application*/ {
+public class MegaplanAPIManager extends Application {
 	
+	public static final String FIELDS_PREFIX = "Category183CustomField";
 	public static final String SERVER_PROTOCOL = "https://";
 	public static final String MEGAPLAN_HOST = "megaplan.ru";
 	
 	public static void main (String... args) {
 		System.setProperty ("megaplan.xlsx.sheet", "TDSheet");
 		
-		//launch (args);
+		launch (args);
 		
+		/*
 		System.out.println ("Authorizing...");
 		
 		try {
@@ -190,13 +179,17 @@ public class MegaplanAPIManager /*extends Application*/ {
 		}
 		
 		System.out.println ("Done");
+		*/
 	}
 	
 	public static final String SCENES_LOCATION = "ru/shemplo/megaplan/updater/gui/schema";
 	public static final String TITLE = "Megaplan API updater";
 	
+	public static final TableManager TABLE_MANAGER = new TableManager ();
+	
 	private static final Map <AppScene, Parent> SCENES;
 	private static Scene STAGE_SCENE = null;
+	private static Stage STAGE = null;
 	
 	static {
 		SCENES = new HashMap <> ();
@@ -206,7 +199,11 @@ public class MegaplanAPIManager /*extends Application*/ {
 		return STAGE_SCENE;
 	}
 	
-	//@Override
+	public static Stage getStage () {
+		return STAGE;
+	}
+	
+	@Override
 	public void start (Stage stage) throws Exception {
 		STAGE_SCENE = new Scene (new Pane (), 100, 50);
 		switchScenes (AppScene.LOADING_SCENE);
@@ -219,10 +216,11 @@ public class MegaplanAPIManager /*extends Application*/ {
 		stage.show ();
 		
 		stage.setOnCloseRequest (we -> {
-			
+			AsyncTaskExecutor.stop ();
 		});
 		
 		switchScenes (AppScene.LOGIN_SCENE);
+		STAGE = stage;
 	}
 	
 	public static void switchScenes (AppScene scene) {

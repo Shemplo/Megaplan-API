@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import ru.shemplo.support.UserProfile;
 
-public class APIFormatter {
+public class APIFormatter_dep {
 
 	private static final Map <String, Function <String, String>> rules;
 	static {
@@ -32,8 +32,8 @@ public class APIFormatter {
 	}
 	
 	public static String format (String key, String value) {
-		if (APIFormatter.rules.containsKey (key)) {
-			return APIFormatter.rules.get (key).apply (value);
+		if (APIFormatter_dep.rules.containsKey (key)) {
+			return APIFormatter_dep.rules.get (key).apply (value);
 		}
 		
 		return value;

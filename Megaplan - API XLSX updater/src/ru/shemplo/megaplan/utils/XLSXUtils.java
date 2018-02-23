@@ -1,4 +1,4 @@
-package ru.shemplo.megaplan.xlsx;
+package ru.shemplo.megaplan.utils;
 
 
 public class XLSXUtils {
