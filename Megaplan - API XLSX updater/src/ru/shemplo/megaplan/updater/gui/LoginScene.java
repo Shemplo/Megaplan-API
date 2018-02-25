@@ -1,5 +1,7 @@
 package ru.shemplo.megaplan.updater.gui;
 
+import static ru.shemplo.megaplan.updater.MegaplanAPIManager.*;
+
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -68,8 +70,8 @@ public class LoginScene extends AbstractScene {
 						login = loginField.getText ().trim (),
 						host = hostField.getText ().trim ();
 				//password = APIConnection.hashMD5 (password);
-				APIConnection_dep.authorize (login, password, host);
-				if (APIConnection_dep.isAuthorized ()) {
+				CONNECTION.authorize (login, password, host);
+				if (CONNECTION.isAuthorized ()) {
 					Platform.runLater ( // Turn back to main thread
 							() -> changeState (true, "Authorized"));
 					MegaplanAPIManager.switchScenes (AppScene.MAIN_SCENE);

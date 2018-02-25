@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ru.shemplo.exception.GUIException;
+import ru.shemplo.megaplan.network.MegaplanConnection;
 import ru.shemplo.megaplan.updater.gui.AppScene;
 import ru.shemplo.megaplan.xlsx.TableManager;
 
@@ -185,13 +186,16 @@ public class MegaplanAPIManager extends Application {
 	public static final String SCENES_LOCATION = "ru/shemplo/megaplan/updater/gui/schema";
 	public static final String TITLE = "Megaplan API updater";
 	
-	public static final TableManager TABLE_MANAGER = new TableManager ();
+	public static final MegaplanConnection CONNECTION;
+	public static final TableManager TABLE_MANAGER;
 	
 	private static final Map <AppScene, Parent> SCENES;
 	private static Scene STAGE_SCENE = null;
 	private static Stage STAGE = null;
 	
 	static {
+		CONNECTION = MegaplanConnection.getInstance ();
+		TABLE_MANAGER = new TableManager ();
 		SCENES = new HashMap <> ();
 	}
 	

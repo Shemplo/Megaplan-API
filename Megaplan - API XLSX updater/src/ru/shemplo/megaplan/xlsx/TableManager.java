@@ -24,6 +24,11 @@ public class TableManager implements AutoCloseable {
 	private XSSFWorkbook workbook;
 	private OPCPackage pkg;
 	
+	
+	public TableManager () {
+		profiles = new ArrayList <> ();
+	}
+	
 	public void loadTableFile (File file) throws TableException {
 		if (file == null) {
 			String message = "Path to input file is null";
@@ -73,7 +78,7 @@ public class TableManager implements AutoCloseable {
 				Cell cell = selectedRow.getCell (c); // Cell in a row
 				String fieldName = columns.get (c).f;
 				
-				if (fieldName == null || fieldName.length () == 0) {
+				if (cell == null || fieldName == null || fieldName.length () == 0) {
 					continue; // Value of this column will be ignored
 				}
 				
@@ -94,17 +99,26 @@ public class TableManager implements AutoCloseable {
 					default: break;
 				}
 				
-				value = columns.get (c).s.apply (value);
+				try {
+					value = columns.get (c).s.apply (value);
+				} catch (Exception e) { continue; }
 				values.add (Pair.make (fieldName, value));
 			}
 			
-			try {
-				UserProfile profile = new UserProfile (row, values);
-				profiles.add (profile); // Saving in a list of parsed
-			} catch (UserProfileException upe) {
-				throw new TableException (upe.getMessage (), upe);
+			if (values.size () > 0) {
+				try {
+					UserProfile profile = new UserProfile (row, values);
+					profiles.add (profile); // Saving in a list of parsed
+				} catch (UserProfileException upe) {
+					throw new TableException (upe.getMessage (), upe);
+				}
 			}
 		}
+	}
+	
+	public int getLoadedProfiles () {
+		if (profiles == null) { return 0; }
+		return profiles.size ();
 	}
 	
 	@Override

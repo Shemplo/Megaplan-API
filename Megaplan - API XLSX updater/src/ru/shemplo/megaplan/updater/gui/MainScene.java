@@ -140,11 +140,15 @@ public class MainScene extends AbstractScene {
 				
 				try {
 					TABLE_MANAGER.parseFileByFormat (columns);
-					message = "Success: File parsed";
+					int profiles = TABLE_MANAGER.getLoadedProfiles ();
+					message = "Success: File parsed (" + profiles + " profiles)";
 				} catch (TableException te) {
 					message = "Error: " + te.getMessage ();
+				} catch (Exception e) {
+					message = "Internal error";
+					e.printStackTrace ();
 				} finally {
-					String mes = message;
+					final String mes = message;
 					Platform.runLater (() -> {
 						changeState (chooseFile, true, logLoading, 
 										logLoading.getText ());
@@ -202,10 +206,13 @@ public class MainScene extends AbstractScene {
 				
 				ChoiceBox <String> formats = (ChoiceBox <String>) col.getChildren ().get (4);
 				formats.getItems ().clear ();
+				formats.setDisable (true);
 				
 				if (DateFormatter.isDateField (box.getValue ())) {
 					formats.setItems (DateFormatter.getList ());
+					
 					formats.setValue (formats.getItems ().get (0));
+					formats.setDisable (false);
 				}
 			});
 			column.getChildren ().add (box);
@@ -215,6 +222,7 @@ public class MainScene extends AbstractScene {
 			column.getChildren ().add (selectFormat);
 			
 			ChoiceBox <String> formatsBox = new ChoiceBox <> ();
+			formatsBox.setDisable (true);
 			formatsBox.setMaxWidth (120);
 			formatsBox.setMinWidth (120);
 			column.getChildren ().add (formatsBox);
